@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+/* import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
 // This endpoint should be called by a cron job every few hours
@@ -24,7 +24,7 @@ export async function GET() {
         }
         return null
       })
-    )
+    ) 
 
     const updatedMovies = updates
       .filter((result): result is PromiseFulfilledResult<string> => 
@@ -42,3 +42,4 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to update movies' }, { status: 500 })
   }
 }
+ */
