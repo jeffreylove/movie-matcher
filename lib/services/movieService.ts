@@ -101,6 +101,40 @@ export async function fetchMoviesForSession(options: MovieSearchParams): Promise
   const { sessionId } = options;
   console.log(`Fetching all movies for session ${sessionId}`);
 
+  // First, check if movies are already stored for this session
+  console.log(`Checking for existing movies for session ${sessionId}...`);
+  
+  // Use a direct JOIN query to get movies in the exact order they're stored
+  // This eliminates any potential issues with ID type conversion or manual sorting
+  const { data: orderedMovies, error: joinError } = await supabase
+    .from('session_movies')
+    .select(`
+      position,
+      movies!inner(*)
+    `)
+    .eq('session_id', sessionId)
+    .order('position', { ascending: true });
+  
+  if (joinError) {
+    console.error('Error fetching session movies with join:', joinError);
+  } else if (orderedMovies && orderedMovies.length > 0) {
+    console.log(`Found ${orderedMovies.length} existing movies for session ${sessionId} using JOIN query`);
+    
+    // Extract the movie objects from the joined result
+    // The structure will be [{position: 0, movies: {id: '123', title: 'Movie 1', ...}}, ...]
+    const movies = orderedMovies.map(item => item.movies);
+    
+    // Log the first few movies to verify order
+    console.log('First 5 movies in order:', movies.slice(0, 5).map(m => `${m.title} (ID: ${m.id})`));
+    
+    console.log(`Retrieved ${movies.length} movies in the correct order for session ${sessionId}`);
+    return { movies };
+  }
+
+  // If we get here, either there are no stored movies for this session,
+  // or there was an error retrieving them. Proceed with normal filtering.
+  console.log('No existing movies found for this session. Filtering and storing new list.');
+
   // Get the session filters
   const { data: sessionData, error: sessionError } = await supabase
     .from('sessions')
@@ -589,6 +623,57 @@ export async function fetchMoviesForSession(options: MovieSearchParams): Promise
   }
   
   console.log(`Randomized ${shuffledMovies.length} movies for better variety`);
+  
+  // Store the movie list for this session in the session_movies table
+  if (shuffledMovies.length > 0) {
+    console.log(`Storing ${shuffledMovies.length} movies for session ${sessionId}`);
+    
+    // First, delete any existing entries for this session
+    const { error: deleteError } = await supabase
+      .from('session_movies')
+      .delete()
+      .eq('session_id', sessionId);
+      
+    if (deleteError) {
+      console.error('Error deleting existing session movies:', deleteError);
+    }
+    
+    // Now insert the new movie list with positions
+    console.log('First 5 movie IDs to store:', shuffledMovies.slice(0, 5).map(m => m.id));
+    console.log('Movie ID types to store:', shuffledMovies.slice(0, 3).map(m => `${m.id} (${typeof m.id})`));
+    
+    // Ensure we're consistently storing movie IDs as strings
+    const movieEntries = shuffledMovies.map((movie, index) => {
+      // Make sure we have a valid ID, convert to string
+      const movieId = movie.id?.toString() || String(movie.id);
+      
+      const entry = {
+        session_id: sessionId,
+        movie_id: movieId,
+        position: index
+      };
+      
+      if (index < 5) {
+        console.log(`Movie entry ${index}:`, entry);
+      }
+      return entry;
+    });
+    
+    // Insert in batches to avoid hitting request size limits
+    const batchSize = 100;
+    for (let i = 0; i < movieEntries.length; i += batchSize) {
+      const batch = movieEntries.slice(i, i + batchSize);
+      const { error: insertError } = await supabase
+        .from('session_movies')
+        .insert(batch);
+        
+      if (insertError) {
+        console.error(`Error storing session movies batch ${i / batchSize + 1}:`, insertError);
+      }
+    }
+    
+    console.log(`Stored ${shuffledMovies.length} movies for session ${sessionId}`);
+  }
   
   // Return all movies at once - no pagination
   return {
