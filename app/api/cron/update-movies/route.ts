@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import { shouldUpdateMovie, updateStreamingInfo } from '@/lib/services/movieService'
 
 // This endpoint should be called by a cron job every few hours
 export async function GET() {
