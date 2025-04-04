@@ -580,23 +580,18 @@ export async function fetchMoviesForSession(options: MovieSearchParams): Promise
   
   console.log(`Filtered to ${filteredMovies.length} movies that match all criteria`);
   
-  // Sort by ratings for better user experience
-  const sortedMovies = filteredMovies
-    .sort((a, b) => {
-      // First try to sort by RT rating
-      const aRating = typeof a.rt_rating === 'string' ? parseFloat(a.rt_rating.replace('%', '')) / 10 : a.rt_rating || 0;
-      const bRating = typeof b.rt_rating === 'string' ? parseFloat(b.rt_rating.replace('%', '')) / 10 : b.rt_rating || 0;
-      
-      if (bRating !== aRating) {
-        return bRating - aRating; // Higher ratings first
-      }
-      
-      // If RT ratings are the same, use IMDB rating as a tiebreaker
-      return (b.imdb_rating || 0) - (a.imdb_rating || 0);
-    });
+  // Randomize the movie list using Fisher-Yates (Knuth) shuffle algorithm
+  // This ensures a more uniform and unbiased randomization than simple Math.random() sorting
+  const shuffledMovies = [...filteredMovies];
+  for (let i = shuffledMovies.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledMovies[i], shuffledMovies[j]] = [shuffledMovies[j], shuffledMovies[i]];
+  }
+  
+  console.log(`Randomized ${shuffledMovies.length} movies for better variety`);
   
   // Return all movies at once - no pagination
   return {
-    movies: sortedMovies
+    movies: shuffledMovies
   };
 }
