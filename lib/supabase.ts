@@ -375,12 +375,16 @@ export async function getFilteredMovies(sessionId: string) {
     query = query.or(`imdb_rating.gte.${filters.min_rating},rt_rating.gte.${filters.min_rating * 10}`)
   }
 
+  // Streaming services filter removed as it's not currently used in the database
+  // If you need to re-implement this in the future, add proper type annotations
+  /*
   if (filters.streaming_services.length > 0) {
-    const streamingConditions = filters.streaming_services.map(service => 
+    const streamingConditions = filters.streaming_services.map((service: string) => 
       `streaming_services->>'${service}' is not null`
     ).join(' or ')
     query = query.or(streamingConditions)
   }
+  */
 
   const { data, error } = await query
 
