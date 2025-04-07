@@ -44,6 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     username: 'Movie Lover',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    avatar_url: null,
   } : null
 
   return (
