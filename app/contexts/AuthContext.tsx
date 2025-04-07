@@ -39,6 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false)
   }, [])
 
+  // Added avatar_url property to fix type error during build
   const profile = userId ? {
     id: userId,
     username: 'Movie Lover',
