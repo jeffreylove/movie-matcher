@@ -24,4 +24,15 @@ module.exports = {
     },
   },
   plugins: [],
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
+  safelist: [
+    // Add any classes that might be dynamically generated and need to be included
+    'bg-primary-500',
+    'bg-primary-600',
+    'text-white',
+    'bg-white/10',
+    'bg-white/20',
+  ],
 }

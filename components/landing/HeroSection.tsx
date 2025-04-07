@@ -5,15 +5,19 @@ import { SessionManager } from '../session/SessionManager'
 
 export function HeroSection() {
   return (
-    <div 
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      style={{ 
-        backgroundImage: "url('/background.jpeg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat"
-      }}
-    >
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-900">
+      {/* Background image as a separate div with absolute positioning */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: "url('/background.jpeg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          opacity: 0.7
+        }}
+      />
+
 
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/40" />
