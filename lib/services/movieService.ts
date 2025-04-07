@@ -122,8 +122,12 @@ export async function fetchMoviesForSession(options: MovieSearchParams): Promise
     
     // Extract the movie objects from the joined result
     // The structure will be [{position: 0, movies: {id: '123', title: 'Movie 1', ...}}, ...]
-    const movies = orderedMovies.map(item => item.movies);
-    
+    // Use type assertion to tell TypeScript that each item.movies is a Movie object
+    const movies = orderedMovies.map(item => {
+      // First cast to unknown, then to Movie to avoid direct casting errors
+      return item.movies as unknown as Movie;
+    });
+  
     // Log the first few movies to verify order
     console.log('First 5 movies in order:', movies.slice(0, 5).map(m => `${m.title} (ID: ${m.id})`));
     
