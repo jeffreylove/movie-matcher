@@ -8,6 +8,7 @@ interface AuthContextType {
   user: { id: string }
   profile: Profile | null
   loading: boolean
+  signIn: (email: string) => Promise<void>
 }
 
 const USER_ID_KEY = 'movie_matcher_user_id'
@@ -27,6 +28,7 @@ const AuthContext = createContext<AuthContextType>({
   user: { id: '' },
   profile: null,
   loading: true,
+  signIn: async () => {}
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -48,12 +50,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     avatar_url: null,
   } : null
 
+  // Mock signIn function - in a real app, this would authenticate with Supabase or similar
+  const signIn = async (email: string): Promise<void> => {
+    console.log(`Sign in attempted with email: ${email}`)
+    // In a real implementation, this would call Supabase auth.signInWithOtp or similar
+    return Promise.resolve()
+  }
+
   return (
     <AuthContext.Provider
       value={{
         user: { id: userId },
         profile,
         loading,
+        signIn
       }}
     >
       {children}
