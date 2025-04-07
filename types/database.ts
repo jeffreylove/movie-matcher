@@ -14,7 +14,7 @@ export interface Profile {
   created_at: string
   updated_at: string
   username: string | null
-  avatar_url: string | null
+  avatar_url?: string | null
 }
 
 export interface Session {
