@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient } from '@supabase/supabase-js'
-import { type Database } from '@/types/database'
+import { type Database, type Match } from '@/types/database'
 
 const supabaseUrl = 'https://xcswgedcigqeddlgkuej.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjc3dnZWRjaWdxZWRkbGdrdWVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5Nzc3NjcsImV4cCI6MjA1NDU1Mzc2N30.v5KLS-cQVpbpzf32-bG7UtW04WCoQwiW1qvKcKOqmSc'
@@ -326,7 +326,7 @@ export async function getSession(sessionId: string) {
 
   // Then get the movie details for any matches
   if (session?.matches?.length > 0) {
-    const movieIds = session.matches.map(m => m.movie_id)
+    const movieIds = session.matches.map((m: Match) => m.movie_id)
     const { data: movies, error: moviesError } = await supabase
       .from('movies')
       .select('*')
